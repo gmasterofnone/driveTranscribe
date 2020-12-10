@@ -5,8 +5,8 @@ const fs = require('fs').promises;
 // Creates a client
 const client = new speech.SpeechClient();
 
-async function transcribeAudio(filename) {
-  console.log(filename)
+async function transcribeAudio({ name }) {
+  const filename = './temp/' + name.split('.')[0] + '.flac'
 
   // Reads a local audio file and converts it to base64
   const file = await fs.readFile(filename);
