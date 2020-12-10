@@ -4,20 +4,16 @@ const parseVideoFiles = require('./parseVideoFiles');
 const downloadVideo = require('./dowloadVideo');
 const transcodeVideo = require('./transcodeVideo');
 const transcribeAudio = require('./transcribeAudio');
+const updateVideoMetaData = require('./updateVideoMetaData');
 
 async function transcribeVideos() {
   const auth = await authorize();
-  const drive = google.drive({version: 'v3', auth});
+  const drive = google.drive({ version: 'v3', auth });
   const video = await parseVideoFiles(drive);
   const videoPath = await downloadVideo(video, drive);
   const transcodedVideoPath = await transcodeVideo(videoPath);
   const transcripts = await transcribeAudio(transcodedVideoPath);
-  console.log(transcripts)
+  await updateVideoMetaData(drive, video, transcripts);
 }
 
 transcribeVideos();
-
-
-
-
-
