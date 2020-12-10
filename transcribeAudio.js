@@ -1,18 +1,12 @@
-// Imports the Google Cloud client library
 const speech = require('@google-cloud/speech');
 const fs = require('fs').promises;
 
-// Creates a client
-const client = new speech.SpeechClient();
 
-async function transcribeAudio({ name }) {
-  const filename = './temp/' + name.split('.')[0] + '.flac'
-
-  // Reads a local audio file and converts it to base64
+async function transcribeAudio(filename) {
+  const client = new speech.SpeechClient();
   const file = await fs.readFile(filename);
   const audioBytes = file.toString('base64');
 
-  // The audio file's encoding, sample rate in hertz, and BCP-47 language code
   const audio = {
     content: audioBytes,
   };
@@ -31,7 +25,8 @@ async function transcribeAudio({ name }) {
   const transcription = response.results
     .map(result => result.alternatives[0].transcript)
     .join('\n');
-  console.log(`Transcription: ${transcription}`);
+  console.log(`Transcribed ${filename.split(7)}`)
+  return transcription.replace(/(\r\n|\n|\r)/gm, "");
 }
 
 module.exports = transcribeAudio;

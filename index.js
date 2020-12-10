@@ -1,9 +1,9 @@
+const { google } = require('googleapis');
 const authorize = require('./authorize');
 const parseVideoFiles = require('./parseVideoFiles');
-const { spawn } = require('child_process');
-const transcribeAudio = require('./transcribeAudio');
 const downloadVideo = require('./dowloadVideo');
-const { google } = require('googleapis');
+const transcodeVideo = require('./transcodeVideo');
+const transcribeAudio = require('./transcribeAudio');
 
 async function transcribeVideos() {
   const auth = await authorize();
@@ -11,22 +11,13 @@ async function transcribeVideos() {
   const video = await parseVideoFiles(drive);
   const videoPath = await downloadVideo(video, drive);
   const transcodedVideoPath = await transcodeVideo(videoPath);
+  const transcripts = await transcribeAudio(transcodedVideoPath);
+  console.log(transcripts)
 }
 
 transcribeVideos();
 
 
 
-async function transcodeVideo(videoPath) {
-  return new Promise(async (resolve, reject) => {
-    const transcodedVideoPath = videoPath.slice(0, -4) + '.flac';
-    const args = ['-f', 'mp4', '-i', videoPath, '-f', 'flac', transcodedVideoPath]
-    const ffmpeg = spawn('ffmpeg', args);
-    console.log(`Transcoding ${videoPath.split(6)} to ${transcodedVideoPath.split(6,0)}`);
-    ffmpeg.stderr.on('end', () => {
-      console.log('done transcoding')
-      resolve(transcodedVideoPath)
-    })
-  })
-}
+
 
